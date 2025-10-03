@@ -1,40 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jewelry Haven | Tienda Principal</title>
-    <link rel="stylesheet" href="./css/styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Repuestos Moto - Tienda</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-    <div id="header-container"></div>
+  <!-- Header dinámico -->
+  <div id="site-header" data-fragment="components/header.html"></div>
+
+  <div class="layout container">
+    <!-- Sidebar dinámico -->
+    <aside id="site-sidebar" data-fragment="components/sidebar.html"></aside>
 
     <main class="main-content">
-        <div id="sidebar-container"></div>
+      <!-- HERO -->
+      <section class="hero">
+        <div class="hero-overlay">
+          <h2>Potencia y Seguridad para tu Moto</h2>
+          <p>Repuestos originales de calidad al mejor precio</p>
+          <a href="#productos" class="btn accent">Ver catálogo</a>
+        </div>
+      </section>
 
-        <section class="product-grid">
-            <h2>Nuestra Colección de Joyería</h2>
-            
-            <div id="product-list-container">
-                </div>
+      <!-- Catálogo -->
+      <section id="productos" class="products-section">
+        <h3>Productos destacados</h3>
 
-            <template id="product-template">
-                <article class="product-card template-card">
-                    <img src="" alt="" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name"></h3>
-                        <p class="product-description"></p>
-                        <p class="product-price"></p>
-                        <button>Ver detalle</button>
-                    </div>
-                </article>
-            </template>
+        <!-- Template para productos -->
+        <template id="product-template">
+          <article class="product-card">
+            <img class="product-img" src="" alt="Imagen del producto" />
+            <div class="product-info">
+              <h4 class="product-name"></h4>
+              <p class="product-desc"></p>
+              <div class="product-meta">
+                <span class="product-price"></span>
+                <button class="btn small buy-btn">Agregar al carrito</button>
+              </div>
+            </div>
+          </article>
+        </template>
 
-        </section>
+        <!-- Contenedor donde se cargan los productos -->
+        <div id="productsGrid" class="products-grid"></div>
+      </section>
     </main>
+  </div>
 
-    <div id="footer-container"></div>
+  <!-- Footer dinámico -->
+  <div id="site-footer" data-fragment="components/footer.html"></div>
 
-    <script src="./js/main.js"></script>
+  <!-- Scripts -->
+  <script src="js/components-loader.js" defer></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>
