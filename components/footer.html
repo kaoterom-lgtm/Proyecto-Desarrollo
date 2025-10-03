@@ -1,0 +1,15 @@
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Repuestos Moto. Todos los derechos reservados.</p>
+    <small class="muted">Proyecto educativo — no usar en producción sin seguridad adicional.</small>
+  </div>
+</footer>
+
+<script>
+  // pequeño script inline para el año del footer
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = new Date().getFullYear();
+    const el = document.getElementById('year');
+    if (el) el.textContent = y;
+  });
+</script>
