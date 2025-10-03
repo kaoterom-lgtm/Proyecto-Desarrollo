@@ -1,132 +1,89 @@
-// ===========================================
-// 1. Web Component: <product-card> con Shadow DOM [cite: 35, 37]
-// ===========================================
-class ProductCard extends HTMLElement {
-    constructor() {
-        super();
-        // Usar Shadow DOM para encapsular la estructura y estilos 
-        this.attachShadow({ mode: 'open' });
+document.addEventListener('DOMContentLoaded', async () => {
+  // Proteger acceso: requiere login
+  if (sessionStorage.getItem('loggedIn') !== 'true') {
+    if (!location.pathname.endsWith('login.html')) {
+      location.href = 'login.html';
+      return;
+    }
+  }
+
+  const productsGrid = document.getElementById('productsGrid');
+  const template = document.getElementById('product-template');
+  let allProducts = [];
+
+  // Carrito con localStorage
+  function getCart(){ return JSON.parse(localStorage.getItem('cart') || '[]'); }
+  function saveCart(cart){ localStorage.setItem('cart', JSON.stringify(cart)); }
+  function updateCartBadge(){
+    const badge = document.getElementById('cartCount');
+    if (badge) badge.textContent = getCart().length;
+  }
+
+  // Renderizar productos
+  function renderProducts(category = "Todos") {
+    productsGrid.innerHTML = "";
+    const filtered = category === "Todos" ? allProducts : allProducts.filter(p => p.category === category);
+
+    if (filtered.length === 0) {
+      productsGrid.innerHTML = `<p>No hay productos en esta categoría.</p>`;
+      return;
     }
 
-    connectedCallback() {
-        // Obtener atributos [cite: 36]
-        const nombre = this.getAttribute('nombre') || 'Producto Desconocido';
-        const precio = this.getAttribute('precio') || '0.00';
-        const descripcion = this.getAttribute('descripcion') || '';
-        const imagen = this.getAttribute('imagen') || '';
+    filtered.forEach(prod => {
+      const clone = template.content.cloneNode(true);
+      clone.querySelector('.product-img').src = prod.img;
+      clone.querySelector('.product-img').alt = prod.name;
+      clone.querySelector('.product-name').textContent = prod.name;
+      clone.querySelector('.product-desc').textContent = prod.description;
+      clone.querySelector('.product-price').textContent = `$ ${prod.price.toFixed(2)}`;
 
-        this.shadowRoot.innerHTML = `
-            <style>
-                /* Estilos encapsulados dentro del Shadow DOM */
-                .card {
-                    border: 1px solid #ddd;
-                    padding: 15px;
-                    text-align: center;
-                    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-                    transition: transform 0.3s;
-                    background-color: #fff;
-                }
-                .card:hover {
-                    transform: translateY(-5px);
-                }
-                .card img {
-                    max-width: 100%;
-                    height: auto;
-                }
-                .card h3 {
-                    color: #A52A2A; /* Color de joyería (ejemplo) */
-                    margin: 10px 0;
-                }
-                .card p.price {
-                    font-weight: bold;
-                    color: #DAA520; /* Dorado */
-                }
-            </style>
-            <div class="card">
-                <img src="./img/${imagen}" alt="${nombre}">
-                <h3>${nombre}</h3>
-                <p>${descripcion}</p>
-                <p class="price">$${parseFloat(precio).toFixed(2)}</p>
-                <button>Comprar</button>
-            </div>
-        `;
+      clone.querySelector('.buy-btn').addEventListener('click', () => {
+        const cart = getCart();
+        cart.push({ name: prod.name, price: prod.price });
+        saveCart(cart);
+        updateCartBadge();
+        alert(`Se agregó al carrito: ${prod.name}`);
+      });
+
+      productsGrid.appendChild(clone);
+    });
+  }
+
+  try {
+    const res = await fetch('data/products.json');
+    if (!res.ok) throw new Error("Error cargando productos");
+    allProducts = await res.json();
+    renderProducts("Todos");
+    updateCartBadge();
+  } catch (err) {
+    console.error(err);
+    productsGrid.innerHTML = `<p class="error">No se pudieron cargar los productos.</p>`;
+  }
+
+  // Detectar clics en sidebar
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-category]')) {
+      e.preventDefault();
+      const cat = e.target.getAttribute('data-category');
+      renderProducts(cat);
+
+      // Scroll suave al catálogo
+      const catalogo = document.getElementById('productos');
+      if (catalogo) {
+        catalogo.scrollIntoView({ behavior: "smooth" });
+      }
     }
-}
+  });
 
-// Definir el Web Component personalizado [cite: 35]
-customElements.define('product-card', ProductCard);
-
-
-// ===========================================
-// 2. Lógica de Carga de Fragmentos HTML (Header, Footer, Sidebar) [cite: 22]
-// ===========================================
-
-/**
- * Carga un fragmento HTML de forma dinámica.
- * @param {string} url - Ruta del fragmento.
- * @param {string} containerId - ID del contenedor donde se insertará.
- */
-async function loadFragment(url, containerId) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error al cargar el fragmento: ${response.statusText}`);
-        }
-        const html = await response.text();
-        document.getElementById(containerId).innerHTML = html;
-    } catch (error) {
-        console.error('Error cargando fragmento:', error);
-    }
-}
-
-// Cargar todos los fragmentos
-loadFragment('./components/header.html', 'header-container');
-loadFragment('./components/footer.html', 'footer-container');
-loadFragment('./components/sidebar.html', 'sidebar-container');
-
-
-// ===========================================
-// 3. Renderización de Productos (Fetch + Plantillas + Web Component) [cite: 33]
-// ===========================================
-
-async function renderProducts() {
-    const container = document.getElementById('product-list-container');
-    const template = document.getElementById('product-template');
-
-    // Cargar productos usando la API Fetch [cite: 33]
-    try {
-        const response = await fetch('./data/productos.json');
-        const products = await response.json();
-
-        products.forEach((product, index) => {
-            // Requisito: Usar <product-card> para parte de la renderización [cite: 38]
-            if (index % 2 === 0) { // Usamos el Web Component para los productos pares
-                const card = document.createElement('product-card');
-                card.setAttribute('nombre', product.nombre);
-                card.setAttribute('precio', product.precio);
-                card.setAttribute('descripcion', product.descripcion);
-                card.setAttribute('imagen', product.imagen);
-                container.appendChild(card);
-            } else { // Usamos la plantilla <template> para los productos impares [cite: 29]
-                // 1. Clonar la plantilla [cite: 29]
-                const clone = template.content.cloneNode(true);
-                
-                // 2. Rellenar datos
-                clone.querySelector('.product-image').src = `./img/${product.imagen}`;
-                clone.querySelector('.product-image').alt = product.nombre;
-                clone.querySelector('.product-name').textContent = product.nombre;
-                clone.querySelector('.product-description').textContent = product.descripcion;
-                clone.querySelector('.product-price').textContent = `$${product.precio.toFixed(2)}`;
-                
-                // 3. Insertar en el contenedor
-                container.appendChild(clone);
-            }
-        });
-
-    } catch (error) {
-        console.error('Error cargando o renderizando productos:', error);
-        container.innerHTML = '<p class="error-message">No se pudieron cargar los productos.</p>';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', renderProducts);
+  // 🔹 Botón de cerrar sesión
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      const confirmar = confirm("¿Quieres cerrar sesión?");
+      if (confirmar) {
+        sessionStorage.removeItem('loggedIn');
+        window.location.href = "login.html";
+      }
+    });
+  }
+});

@@ -1,46 +1,28 @@
-// /js/login.js
-
+// Login simple (educativo). Credenciales "quemadas".
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Obtener elementos del DOM
-    const loginForm = document.getElementById('login-form');
-    const errorMessage = document.getElementById('login-error');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
+  const form = document.getElementById('loginForm');
+  const errEl = document.getElementById('loginError');
 
-    // Credenciales quemadas (usamos 'admin' y '123' como antes)
-    const USERNAME = 'admin';
-    const PASSWORD = '123';
+  const CREDENTIALS = { user: 'estudiante', pass: 'contraseña123' };
 
-    // 2. Agregar el listener del evento 'submit'
-    loginForm.addEventListener('submit', (e) => {
-        // MUY IMPORTANTE: Previene que el formulario se envíe de forma tradicional 
-        // y recargue la página, permitiendo que JS maneje la validación.
-        e.preventDefault(); 
-        
-        // Limpiar mensajes de error previos
-        errorMessage.textContent = '';
-        
-        const usernameValue = usernameInput.value;
-        const passwordValue = passwordInput.value;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = form.username.value.trim();
+    const password = form.password.value.trim();
 
-        if (usernameValue === USERNAME && passwordValue === PASSWORD) {
-            // Login correcto
-            
-            // Opción 1 (Preferida): Redirección a index.html (asumiendo que está en la misma carpeta)
-            window.location.href = 'index.html'; 
+    if (username === CREDENTIALS.user && password === CREDENTIALS.pass) {
+      // Guardamos un flag sencillo en sessionStorage (no seguro, solo demo)
+      sessionStorage.setItem('loggedIn', 'true');
+      window.location.href = 'index.html';
+    } else {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Usuario o contraseña incorrectos.';
+      setTimeout(() => { errEl.style.display = 'none'; }, 3500);
+    }
+  });
 
-            // Si la Opción 1 falla, prueba esta:
-            // window.location.href = './index.html'; 
-            
-            // Si NINGUNA funciona (posible problema de servidor local), descomenta la siguiente línea 
-            // para verificar que al menos la lógica JS se ejecuta correctamente:
-            // alert('Login Exitoso, revisa la ruta de redirección.');
-
-        } else {
-            // Login incorrecto
-            errorMessage.textContent = '❌ Usuario o contraseña incorrectos. Intenta con admin/123.';
-            // Limpiar campo de contraseña por seguridad
-            passwordInput.value = '';
-        }
-    });
+  // Si ya está logueado, redirige directamente
+  if (sessionStorage.getItem('loggedIn') === 'true' && location.pathname.endsWith('login.html')) {
+    location.href = 'index.html';
+  }
 });
