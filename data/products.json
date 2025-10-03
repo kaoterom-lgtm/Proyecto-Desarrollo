@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Pastilla de freno DELTA",
+    "price": 42.50,
+    "description": "Pastilla de freno de alta fricción.",
+    "img": "assets/images/freno.jpg",
+    "category": "Frenos"
+  },
+  {
+    "id": 2,
+    "name": "Filtro de aire K-FLOW",
+    "price": 28.99,
+    "description": "Filtro lavable de alto rendimiento.",
+    "img": "assets/images/filtro.jpg",
+    "category": "Filtros"
+  },
+  {
+    "id": 3,
+    "name": "Bujía NGK X7",
+    "price": 9.75,
+    "description": "Bujía de larga duración.",
+    "img": "assets/images/bujia.jpg",
+    "category": "Bujías"
+  },
+  {
+    "id": 4,
+    "name": "Llanta 90/90-18 Racer",
+    "price": 110.00,
+    "description": "Llanta radial urbana con excelente agarre.",
+    "img": "assets/images/llanta.jpg",
+    "category": "Neumáticos"
+  },
+  {
+    "id": 5,
+    "name": "Batería 12V PowerMax",
+    "price": 150.00,
+    "description": "Batería sellada de alto rendimiento.",
+    "img": "assets/images/bateria.jpg",
+    "category": "Baterías"
+  }
+]
