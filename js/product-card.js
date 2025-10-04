@@ -43,7 +43,7 @@ class ProductCard extends HTMLElement {
   attributeChangedCallback(){ this._render(); }
 
   _upgradeProps(){
-    // Move any properties set before definition to attributes
+    // Mueva cualquier propiedad establecida antes de la definición a atributos
     ['name','price','desc','img'].forEach(prop => {
       if (this.hasOwnProperty(prop)) {
         const val = this[prop];
